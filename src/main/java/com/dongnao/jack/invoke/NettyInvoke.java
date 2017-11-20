@@ -6,16 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.dongnao.jack.configBean.Reference;
 import com.dongnao.jack.loadbalance.LoadBalance;
 import com.dongnao.jack.loadbalance.NodeInfo;
-import com.dongnao.jack.rpc.http.HttpRequest;
+import com.dongnao.jack.netty.NettyUtil;
 
-/** 
- * @Description 这个是http的调用过程 
- * @ClassName   HttpInvoke 
- * @Date        2017年11月14日 下午10:10:44 
- * @Author      dn-jack 
- */
-
-public class HttpInvoke implements Invoke {
+public class NettyInvoke implements Invoke {
     
     public String invoke(Invocation invocation) throws Exception {
         try {
@@ -40,13 +33,9 @@ public class HttpInvoke implements Invoke {
             sendparam.put("paramTypes", invocation.getMethod()
                     .getParameterTypes());
             
-            //http://127.0.0.1:8023/jack/soa/service
-            String url = "http://" + nodeinfo.getHost() + ":"
-                    + nodeinfo.getPort() + nodeinfo.getContextpath();
-            
-            //调用对端的生产者的服务
-            String result = HttpRequest.sendPost(url, sendparam.toJSONString());
-            return result;
+            return NettyUtil.sendMsg(nodeinfo.getHost(),
+                    nodeinfo.getPort(),
+                    sendparam.toJSONString());
         }
         catch (Exception e) {
             throw e;
